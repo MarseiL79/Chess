@@ -15,6 +15,7 @@ public class App extends Application {
         Scene scene = new Scene(panel, 400, 400);
 
         primaryStage.setTitle("JavaFX TEST");
+        System.out.println("HELLO");
         primaryStage.setScene(scene);
         primaryStage.show();
 
