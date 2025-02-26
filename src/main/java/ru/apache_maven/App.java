@@ -21,29 +21,7 @@ public class App extends Application {
         primaryStage.setScene(scene);
         primaryStage.show();
 
-        //Без FXML файла, напрямую через Java-код
-       /* Button button = new Button("Test");
-        Text text = new Text(200, 200, "Test javafx!");
-        text.setFont(new Font(60));
-        BorderPane pane =  new BorderPane();
-        pane.setCenter(button);
-        pane.setTop(text);
 
-        button.setOnAction(e -> {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, "WOF WOF WOF!!!");
-        alert.showAndWait();
-    });
-
-        InputStream iconStream = getClass().getResourceAsStream("/images/pion.png");
-        Image image = new Image(iconStream);
-        primaryStage.getIcons().add(image);
-
-        Scene scene = new Scene(pane, 500, 500);
-
-        primaryStage.setTitle("JavaFX title");
-        primaryStage.setScene(scene);
-
-        primaryStage.show();*/
     }
 
     public static void main(String[] args) {
