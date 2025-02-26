@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import java.util.*?>
+<?import javafx.scene.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane fx:controller="ru.apache_maven.Controller" xmlns:fx="http://javafx.com/fxml" alignment="center" hgap="10" vgap="10">
+    <BorderPane>
+        <top>
+            <Label text="test javafx!"/>
+        </top>
+        <center>
+            <Button text="test"/>
+        </center>
+    </BorderPane>
+</GridPane>
