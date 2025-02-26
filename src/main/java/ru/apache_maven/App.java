@@ -5,12 +5,14 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 
+import java.util.Objects;
+
 
 public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
         //Через FXML файл
-        Parent panel = FXMLLoader.load(getClass().getResource("/maket.fxml"));
+        Parent panel = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/maket.fxml")));
 
         Scene scene = new Scene(panel, 400, 400);
 
