@@ -16,8 +16,7 @@ public class App extends Application {
 
         Scene scene = new Scene(panel, 400, 400);
 
-        primaryStage.setTitle("JavaFX TEST");
-        System.out.println("HELLO");
+        primaryStage.setTitle("Chess Game");
         primaryStage.setScene(scene);
         primaryStage.show();
 
@@ -25,6 +24,12 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
+        Board board = new Board();
+        board.setupDefaultPiecePositions();
+
+        BoardConsoleRenderer renderer = new BoardConsoleRenderer();
+        renderer.render(board);
+
         Application.launch();
     }
 

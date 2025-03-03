@@ -1,2 +1,14 @@
+ru\apache_maven\pieces\Bishop.class
+ru\apache_maven\pieces\Queen.class
+ru\apache_maven\Coordinates.class
+ru\apache_maven\File.class
+ru\apache_maven\Board.class
+ru\apache_maven\pieces\Pawn.class
 ru\apache_maven\Controller.class
+ru\apache_maven\pieces\Piece.class
+ru\apache_maven\pieces\Rook.class
+ru\apache_maven\Color.class
+ru\apache_maven\BoardConsoleRenderer.class
 ru\apache_maven\App.class
+ru\apache_maven\pieces\King.class
+ru\apache_maven\pieces\Knight.class
