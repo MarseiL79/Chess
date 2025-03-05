@@ -8,6 +8,7 @@ ru\apache_maven\Controller.class
 ru\apache_maven\pieces\Piece.class
 ru\apache_maven\pieces\Rook.class
 ru\apache_maven\Color.class
+ru\apache_maven\pieces\CoordinatesShift.class
 ru\apache_maven\BoardConsoleRenderer.class
 ru\apache_maven\App.class
 ru\apache_maven\pieces\King.class

@@ -1,6 +1,7 @@
 package ru.apache_maven;
 
 import javafx.scene.shape.Rectangle;
+import ru.apache_maven.pieces.Piece;
 
 import javax.swing.*;
 
@@ -16,7 +17,12 @@ public class BoardConsoleRenderer {
         for (int rank = 8; rank >= 1; rank--) {
             String line = "";
             for (File file : File.values()) {
-                line += getSpriteForEmptyCell(new Coordinates(file, rank));
+                Coordinates coordinates = new Coordinates(file, rank);
+                if (board.isSquareEmpty(coordinates)) {
+                    line += getSpriteForEmptyCell(new Coordinates(file, rank));
+                } else {
+                    line += getPieceSprite(board.getPiece(coordinates));
+                }
             }
             line += ANSI_RESET;
             System.out.println(line);
@@ -28,13 +34,13 @@ public class BoardConsoleRenderer {
         //format = background color, font color, text
         String result = sprite;
 
-        if(pieceColor == Color.WHITE) {
+        if (pieceColor == Color.WHITE) {
             result = ANSI_WHITE_PIECE_COLOR + result;
         } else {
             result = ANSI_BLACK_PIECE_COLOR + result;
         }
 
-        if(isCellDark) {
+        if (isCellDark) {
             result = ANSI_BLACK_CELL_BACKGROUND_COLOR + result;
         } else {
             result = ANSI_WHITE_CELL_BACKGROUND_COLOR + result;
@@ -45,6 +51,30 @@ public class BoardConsoleRenderer {
 
 
     private String getSpriteForEmptyCell(Coordinates coordinates) {
-        return colorizeSprite("   ", Color.WHITE, Board.isCellDark(coordinates));
+        return colorizeSprite("    ", Color.WHITE, Board.isCellDark(coordinates));
+    }
+
+
+    private String selectUnicodeSpriteForPiece(Piece piece) {
+        switch (piece.getClass().getSimpleName()) {
+            case "Pawn":
+                return "♟"; // Пешка
+            case "Knight":
+                return "♘"; // Конь
+            case "King":
+                return "♔"; // Король
+            case "Queen":
+                return "♕"; // Ферзь
+            case "Rook":
+                return "♖"; // Ладья
+            case "Bishop":
+                return "♗"; // Слон
+            default:
+                return "?"; // На случай неизвестной фигуры
+        }
+    }
+
+    private String getPieceSprite(Piece piece) {
+        return colorizeSprite(" " + selectUnicodeSpriteForPiece(piece) + " ", piece.color, Board.isCellDark(piece.coordinates));
     }
 }
