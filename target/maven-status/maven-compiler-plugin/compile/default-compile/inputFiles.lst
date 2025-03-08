@@ -1,10 +1,12 @@
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\App.java
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\Board.java
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\BoardConsoleRenderer.java
+C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\ChessController.java
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\Color.java
-C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\Controller.java
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\Coordinates.java
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\File.java
+C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\Game.java
+C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\InputCoordinates.java
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\pieces\Bishop.java
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\pieces\CoordinatesShift.java
 C:\Users\Max\Desktop\Projects Java\JavaFX_Test\testJavaFX_Project\src\main\java\ru\apache_maven\pieces\King.java

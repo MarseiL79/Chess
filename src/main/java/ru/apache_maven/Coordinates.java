@@ -21,8 +21,8 @@ public class Coordinates {
         int f = file.ordinal() + shift.fileShift;
         int r = rank + shift.rankShift;
 
-        if (f < 0 || f > 8) {return false;}
-        if (r < 0 || r > 8) {return false;}
+        if ((f < 0) || (f > 7)) return false; // 0..7 - good
+        if ((r < 1) || (r > 8)) return false; // 1..8 - good
 
         return true;
     }

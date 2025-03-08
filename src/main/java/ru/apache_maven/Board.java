@@ -12,6 +12,21 @@ public class Board {
         pieces.put(coordinates, piece);
     }
 
+    public HashMap<Coordinates, Piece> getMatrix() {
+        return pieces;
+    }
+
+    public void removePiece(Coordinates coordinates) {
+        pieces.remove(coordinates);
+    }
+
+    public void movePiece(Coordinates from, Coordinates to) {
+        Piece piece = getPiece(from);
+
+        removePiece(from);
+        setPiece(to, piece);
+    }
+
     public void setupDefaultPiecePositions() {
         for (File file : File.values()) {
             //Setting Pawns
@@ -36,12 +51,6 @@ public class Board {
         setPiece(new Coordinates(File.B, 8), new Knight(Color.BLACK, new Coordinates(File.B, 8)));
         setPiece(new Coordinates(File.G, 8), new Knight(Color.BLACK, new Coordinates(File.G, 8)));
 
-        //Setting Knights
-        setPiece(new Coordinates(File.B, 1), new Knight(Color.WHITE, new Coordinates(File.B, 1)));
-        setPiece(new Coordinates(File.G, 1), new Knight(Color.WHITE, new Coordinates(File.G, 1)));
-        setPiece(new Coordinates(File.B, 8), new Knight(Color.BLACK, new Coordinates(File.B, 8)));
-        setPiece(new Coordinates(File.G, 8), new Knight(Color.BLACK, new Coordinates(File.G, 8)));
-
         //Setting Kings and Queens
         setPiece(new Coordinates(File.E, 1), new King(Color.WHITE, new Coordinates(File.E, 1)));
         setPiece(new Coordinates(File.E, 8), new King(Color.BLACK, new Coordinates(File.E, 8)));
@@ -54,7 +63,7 @@ public class Board {
     }
 
     public boolean isSquareEmpty(Coordinates coordinates) {
-        return !pieces.containsKey(coordinates);
+        return !(pieces.containsKey(coordinates));
     }
 
     public Piece getPiece(Coordinates coordinates) {

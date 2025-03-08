@@ -15,12 +15,22 @@ import java.util.Set;
 
 
 public class App extends Application {
+    class Delta {
+        double x, y;
+    }
     @Override
     public void start(Stage primaryStage) throws Exception {
         //Через FXML файл
-        Parent panel = FXMLLoader.load(Objects.requireNonNull(getClass().getResource("/maket.fxml")));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("/maket.fxml"));
+        Parent panel = loader.load();
 
-        Scene scene = new Scene(panel, 400, 400);
+        Board board = new Board();
+        board.setupDefaultPiecePositions(); // Устанавливаем начальные позиции фигур
+
+        ChessController controller = loader.getController();
+        controller.setBoard(board); // Передаём board в контроллер
+
+        Scene scene = new Scene(panel, 1000, 600);
 
         primaryStage.setTitle("Chess Game");
         primaryStage.setScene(scene);
@@ -33,16 +43,16 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-        Board board = new Board();
-        board.setupDefaultPiecePositions();
 
-        BoardConsoleRenderer renderer = new BoardConsoleRenderer();
-        renderer.render(board);
+        //BoardConsoleRenderer renderer = new BoardConsoleRenderer();
+        //renderer.render(board);
 
-        Piece piece = board.getPiece(new Coordinates(File.B, 1));
-        Set<Coordinates> availableMoves = piece.getAvailableMoveSquares(board);
+        //Piece piece = board.getPiece(new Coordinates(File.B, 1));
+        //Set<Coordinates> availableMoves = piece.getAvailableMoveSquares(board);
 
-        int a = 123;
+        /*for (Coordinates coordinates: availableMoves) {
+            System.out.println(coordinates.file + " " + coordinates.rank);
+        }*/
 
         Application.launch();
     }
