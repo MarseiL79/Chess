@@ -1,16 +1,20 @@
 package ru.apache_maven.pieces;
 
-import ru.apache_maven.Color;
+import ru.apache_maven.ColorChess;
 import ru.apache_maven.Coordinates;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class Knight extends Piece {
-    public Knight(Color color, Coordinates coordinates) {
+    public Knight(ColorChess color, Coordinates coordinates) {
         super(color, coordinates);
+    }
+
+    @Override
+    public String getPathToImage() {
+        return "";
     }
 
     @Override

@@ -1,3 +1,4 @@
+ru\apache_maven\ColorChess.class
 ru\apache_maven\pieces\Queen.class
 ru\apache_maven\Coordinates.class
 ru\apache_maven\ChessController.class
@@ -13,6 +14,4 @@ ru\apache_maven\pieces\Bishop.class
 ru\apache_maven\File.class
 ru\apache_maven\Board.class
 ru\apache_maven\pieces\Rook.class
-ru\apache_maven\App$Delta.class
-ru\apache_maven\Color.class
 ru\apache_maven\BoardConsoleRenderer.class

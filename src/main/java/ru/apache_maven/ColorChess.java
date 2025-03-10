@@ -1,6 +1,6 @@
 package ru.apache_maven;
 
-public enum Color {
+public enum ColorChess {
     BLACK,
     WHITE
 }

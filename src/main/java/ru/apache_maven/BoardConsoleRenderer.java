@@ -1,9 +1,6 @@
 package ru.apache_maven;
 
-import javafx.scene.shape.Rectangle;
 import ru.apache_maven.pieces.Piece;
-
-import javax.swing.*;
 
 public class BoardConsoleRenderer {
 
@@ -30,11 +27,11 @@ public class BoardConsoleRenderer {
 
     }
 
-    private String colorizeSprite(String sprite, Color pieceColor, boolean isCellDark) {
+    private String colorizeSprite(String sprite, ColorChess pieceColor, boolean isCellDark) {
         //format = background color, font color, text
         String result = sprite;
 
-        if (pieceColor == Color.WHITE) {
+        if (pieceColor == ColorChess.WHITE) {
             result = ANSI_WHITE_PIECE_COLOR + result;
         } else {
             result = ANSI_BLACK_PIECE_COLOR + result;
@@ -51,7 +48,7 @@ public class BoardConsoleRenderer {
 
 
     private String getSpriteForEmptyCell(Coordinates coordinates) {
-        return colorizeSprite("    ", Color.WHITE, Board.isCellDark(coordinates));
+        return colorizeSprite("    ", ColorChess.WHITE, Board.isCellDark(coordinates));
     }
 
 

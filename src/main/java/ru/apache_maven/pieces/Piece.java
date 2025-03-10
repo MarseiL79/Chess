@@ -1,22 +1,22 @@
 package ru.apache_maven.pieces;
 
 import ru.apache_maven.Board;
-import ru.apache_maven.Color;
+import ru.apache_maven.ColorChess;
 import ru.apache_maven.Coordinates;
 
 import java.util.HashSet;
 import java.util.Set;
 
 public abstract class Piece {
-    public final Color color;
+    public final ColorChess color;
     public Coordinates coordinates;
 
-    public Piece(Color color, Coordinates coordinates) {
+    public Piece(ColorChess color, Coordinates coordinates) {
         this.color = color;
         this.coordinates = coordinates;
     }
 
-    public Color getColor() {
+    public ColorChess getColor() {
         return color;
     }
     public Set<Coordinates> getAvailableMoveSquares(Board board) {
@@ -42,6 +42,8 @@ public abstract class Piece {
     private boolean isSquareAvailableForMove(Coordinates coordinates, Board board) {
         return board.isSquareEmpty(coordinates) || board.getPiece(coordinates).color != color;
     }
+
+    public abstract String getPathToImage();
 
     protected abstract Set<CoordinatesShift> getPieceMoves();
 

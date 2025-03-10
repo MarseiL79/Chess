@@ -4,6 +4,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import ru.apache_maven.pieces.CoordinatesShift;
 import ru.apache_maven.pieces.Piece;
@@ -15,9 +16,6 @@ import java.util.Set;
 
 
 public class App extends Application {
-    class Delta {
-        double x, y;
-    }
     @Override
     public void start(Stage primaryStage) throws Exception {
         //Через FXML файл
@@ -30,8 +28,9 @@ public class App extends Application {
         ChessController controller = loader.getController();
         controller.setBoard(board); // Передаём board в контроллер
 
-        Scene scene = new Scene(panel, 1000, 600);
-
+        Scene scene = new Scene(panel, 1000, 800);
+        scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
+        //scene.setFill(Color.LIGHTBLUE); // Задаём цвет заливки для сцены
         primaryStage.setTitle("Chess Game");
         primaryStage.setScene(scene);
         primaryStage.show();
