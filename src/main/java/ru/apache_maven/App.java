@@ -7,6 +7,8 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import ru.apache_maven.pieces.CoordinatesShift;
+import ru.apache_maven.pieces.Knight;
+import ru.apache_maven.pieces.Pawn;
 import ru.apache_maven.pieces.Piece;
 
 //import java.util.
@@ -23,14 +25,15 @@ public class App extends Application {
         Parent panel = loader.load();
 
         Board board = new Board();
+        GameLogic gameLogic = new GameLogic();
         board.setupDefaultPiecePositions(); // Устанавливаем начальные позиции фигур
 
         ChessController controller = loader.getController();
         controller.setBoard(board); // Передаём board в контроллер
+        controller.setGameLogic(gameLogic);
 
         Scene scene = new Scene(panel, 1000, 800);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
-        //scene.setFill(Color.LIGHTBLUE); // Задаём цвет заливки для сцены
         primaryStage.setTitle("Chess Game");
         primaryStage.setScene(scene);
         primaryStage.show();
@@ -38,20 +41,21 @@ public class App extends Application {
         InputStream iconStream = getClass().getResourceAsStream("/images/pion.png");
         Image image = new Image(iconStream);
         primaryStage.getIcons().add(image);
+        primaryStage.setResizable(false);
 
     }
 
     public static void main(String[] args) {
 
-        //BoardConsoleRenderer renderer = new BoardConsoleRenderer();
-        //renderer.render(board);
+        Board board = new Board();
+        board.setPiece(new Coordinates(File.B, 1), new Knight(ColorChess.WHITE, new Coordinates(File.B, 1)));
 
-        //Piece piece = board.getPiece(new Coordinates(File.B, 1));
-        //Set<Coordinates> availableMoves = piece.getAvailableMoveSquares(board);
+        Piece piece = board.getPiece(new Coordinates(File.B, 1));
+        Set<Coordinates> availableMoves = piece.getAvailableMoveSquares(board);
 
-        /*for (Coordinates coordinates: availableMoves) {
+        for (Coordinates coordinates: availableMoves) {
             System.out.println(coordinates.file + " " + coordinates.rank);
-        }*/
+        }
 
         Application.launch();
     }

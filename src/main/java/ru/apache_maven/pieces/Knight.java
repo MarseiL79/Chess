@@ -14,23 +14,26 @@ public class Knight extends Piece {
 
     @Override
     public String getPathToImage() {
-        return "";
+        String res = "";
+        if (this.getColor() == ColorChess.WHITE) { res = "/images/white_knight.png"; }
+        else { res = "/images/black_knight.png"; }
+        return res;
     }
 
     @Override
     protected Set<CoordinatesShift> getPieceMoves() {
         return new HashSet<>(Arrays.asList(
-            new CoordinatesShift(1, 2),
-            new CoordinatesShift(2, 1),
-
-            new CoordinatesShift(2, -1),
-            new CoordinatesShift(1, -2),
-
-            new CoordinatesShift(-2, -1),
             new CoordinatesShift(-1, -2),
+            new CoordinatesShift(-2, -1),
 
+            new CoordinatesShift(-2, 1),
             new CoordinatesShift(-1, 2),
-            new CoordinatesShift(-2, 1)
+
+            new CoordinatesShift(2, 1),
+            new CoordinatesShift(1, 2),
+
+            new CoordinatesShift(1, -2),
+            new CoordinatesShift(2, -1)
         )
         );
     }

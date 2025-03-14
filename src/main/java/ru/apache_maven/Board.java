@@ -5,7 +5,11 @@ import ru.apache_maven.pieces.*;
 import java.util.HashMap;
 
 public class Board {
-    HashMap<Coordinates, Piece> pieces = new HashMap<>();
+    HashMap<Coordinates, Piece> pieces;
+
+    public Board() {
+        pieces = new HashMap<>();
+    }
 
     public void setPiece(Coordinates coordinates, Piece piece) {
         piece.coordinates = coordinates;
@@ -30,7 +34,7 @@ public class Board {
     public void setupDefaultPiecePositions() {
         for (File file : File.values()) {
             //Setting Pawns
-            setPiece(new Coordinates(file, 2), new Pawn(ColorChess.WHITE, new Coordinates(file, 2)));
+            //setPiece(new Coordinates(file, 2), new Pawn(ColorChess.WHITE, new Coordinates(file, 2)));
             setPiece(new Coordinates(file, 7), new Pawn(ColorChess.BLACK, new Coordinates(file, 7)));
         }
         //Setting Rooks
@@ -56,6 +60,8 @@ public class Board {
         setPiece(new Coordinates(File.E, 8), new King(ColorChess.BLACK, new Coordinates(File.E, 8)));
         setPiece(new Coordinates(File.D, 1), new Queen(ColorChess.WHITE, new Coordinates(File.D, 1)));
         setPiece(new Coordinates(File.D, 8), new Queen(ColorChess.BLACK, new Coordinates(File.D, 8)));
+
+        setPiece(new Coordinates(File.A, 3), new Pawn(ColorChess.WHITE, new Coordinates(File.A, 3)));
     }
 
     public static boolean isCellDark(Coordinates coordinates) {
