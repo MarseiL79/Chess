@@ -2,8 +2,6 @@ package ru.apache_maven;
 
 import ru.apache_maven.pieces.CoordinatesShift;
 
-import java.util.Objects;
-
 public class Coordinates {
     public final File file;
     public final Integer rank;

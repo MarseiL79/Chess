@@ -4,7 +4,6 @@ import javafx.scene.control.Label;
 import ru.apache_maven.Board;
 import ru.apache_maven.ColorChess;
 import ru.apache_maven.Coordinates;
-import ru.apache_maven.File;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -58,12 +57,6 @@ public abstract class Piece {
     }
 
     private boolean isSquareAvailableForMove(Coordinates coordinates, Board board) {
-//        System.out.println("Пустой?: " + board.isSquareEmpty(coordinates) + coordinates.file + " " + coordinates.rank);
-//        System.out.println("цвет this" +  this.getColor());
-//        if(board.getPiece(coordinates) != null) {
-//            System.out.println("цвет new: " + board.getPiece(coordinates).getColor());
-//        }
-//        System.out.println(" ");
         return board.isSquareEmpty(coordinates) || board.getPiece(coordinates).color != this.getColor();
     }
 

@@ -13,9 +13,6 @@ public class GameLogic {
     public ColorChess getTurnColor() {
         return turnColor;
     }
-    public void turn() {
-
-    }
 
     public void changeTurnColor(Rectangle turnColorRectangle) {
         if (turnColor == ColorChess.WHITE) {
