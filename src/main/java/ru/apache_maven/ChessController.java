@@ -3,6 +3,8 @@ package ru.apache_maven;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
@@ -19,12 +21,15 @@ public class ChessController implements Initializable {
     private GridPane chessBoardGrid;
     @FXML
     private Rectangle turnColorRectangle;
+    @FXML
+    private Label statusLabel;
     private Board board;
     private Piece selectedPiece;
     private ImageView selectedPieceImage;
     private Coordinates selectedCoordinates;
     private HashMap<Pane, String> highlightedCells = new HashMap<>();
     private GameLogic gameLogic;
+
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -53,6 +58,7 @@ public class ChessController implements Initializable {
         for (int row = 0; row < boardSize; row++) {
             for (int col = 0; col < boardSize; col++) {
                 Pane cell = new Pane();
+                cell.getStyleClass().add("grid-cell");
                 //cell.setMaxSize(80, 80);
                 cell.setPrefSize(tileSize, tileSize);
                 if ((row + col) % 2 == 0) {
@@ -82,15 +88,20 @@ public class ChessController implements Initializable {
             pieceImage.setFitHeight(80);
 
             pieceImage.setOnMouseClicked(event -> {
-                //if (selectedPiece != null && piece.getColor() != gameLogic.getTurnColor()) { }
-                // Если уже выбрана фигура, можно снять выделение
+                clearHighlights();
+
                 if (selectedPieceImage != null) {
                     if(selectedPiece == piece) {
                         selectedPieceImage.setStyle(""); selectedPiece = null;
-                        selectedPieceImage = null; selectedCoordinates = null; highlightedCellsToDefault(); return;
+                        selectedPieceImage = null; selectedCoordinates = null; highlightedCellsToDefault();
+                        highlightedCells.clear(); return;
                     }
-                    if(selectedPiece.getColor() != piece.getColor() && selectedPiece.getAvailableMoveSquares(board).contains(piece.getCoordinates()))
-                        { moveSelectedPiece(piece.getCoordinates()); gameLogic.changeTurnColor(turnColorRectangle); return; } //если скушали фигуру, меняем цвет хода
+                    if(selectedPiece.getColor() != piece.getColor() && selectedPiece.getLegalMoveSquares(statusLabel, board).contains(piece.getCoordinates()))
+                        { gameLogic.changeTurnColor(turnColorRectangle); moveSelectedPiece(piece.getCoordinates());
+                            showAlertOnCheckmate("Поражение", "Мат королю цвета " + gameLogic.getTurnColor(),
+                                    board.isCheckmate(statusLabel, gameLogic.getTurnColor(),
+                                            board.isKingInCheck(statusLabel, gameLogic.getTurnColor())));
+                            return; } //если скушали фигуру, меняем цвет хода .....
                     selectedPieceImage.setStyle(""); // сброс стиля предыдущего выделения
                     highlightedCellsToDefault();
                 }
@@ -99,7 +110,7 @@ public class ChessController implements Initializable {
                     selectedPieceImage = pieceImage;
                     selectedCoordinates = coord;
                     pieceImage.setStyle("-fx-effect: dropshadow(three-pass-box, blue, 10, 0, 0, 0);");
-                    highlightMoves(piece.getAvailableMoveSquares(board));
+                    highlightMoves(piece.getLegalMoveSquares(statusLabel, board));
                 }
                 //System.out.println("Цвет выбранной фигуры: " + piece.getColor());
             });
@@ -122,14 +133,19 @@ public class ChessController implements Initializable {
             Pane cell = (Pane) getNodeByRowColumnIndex(8 - move.rank, move.file.ordinal(), chessBoardGrid);
             if (cell != null) {
                 // Сохраняем первоначальный стиль, чтобы потом его восстановить
+               // cell.getStyleClass().add("grid-cell");
                 highlightedCells.put(cell, cell.getStyle());
-                // Подсвечиваем клетку зелёным
-                cell.setStyle("-fx-background-color: lightgreen;");
-                // Добавляем обработчик клика по этой клетке
+                //cell.getStyleClass().add("highlighted-cell");
+                cell.setStyle("-fx-background-color: rgb(102,255,130);");
                 cell.setOnMouseClicked(e -> {
-                    moveSelectedPiece(move);
                     clearHighlights();
-                    gameLogic.changeTurnColor(turnColorRectangle); //если ходим на возможный ход, меняем цвет хода
+                    gameLogic.changeTurnColor(turnColorRectangle);
+                    if(selectedPiece == null) {return;}
+                    moveSelectedPiece(move);
+                    showAlertOnCheckmate("Поражение", "Мат королю цвета " + gameLogic.getTurnColor(),
+                            board.isCheckmate(statusLabel, gameLogic.getTurnColor(),
+                                    board.isKingInCheck(statusLabel, gameLogic.getTurnColor())));
+                     //если ходим на возможный ход, меняем цвет хода
                 });
             }
         }
@@ -148,16 +164,50 @@ public class ChessController implements Initializable {
 
     private void moveSelectedPiece(Coordinates target) {
         if (selectedPiece == null) return;
-        // Обновляем модель: перемещаем фигуру из выбранной клетки в целевую
+        // Обновляем модель: перемещаем фигуру
         board.movePiece(selectedCoordinates, target);
-        // Обновляем UI: очищаем GridPane и перерисовываем доску и фигуры
+        // Обновляем UI: перерисовываем доску и фигуры
         chessBoardGrid.getChildren().clear();
         setupChessBoard();
         renderPieces();
         // Сбрасываем выбранную фигуру
+        if(!board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) { SoundManager.playMoveSound(); }
         selectedPiece = null;
         selectedPieceImage = null;
         selectedCoordinates = null;
+        if(board.isStalemate(gameLogic.getTurnColor())) { showAlertOnStalemate("Пат",
+                "Патовая ситуация для короля цвета " + gameLogic.getTurnColor()); }
+        else if(board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
+            SoundManager.playCheckSound();
+            statusLabel.setText("Шах");
+            statusLabel.setLayoutX(93);
+        } else {
+            statusLabel.setText("Статус игры");
+            statusLabel.setLayoutX(57);
+        }
+    }
+
+    private void showAlertOnCheckmate(String title, String message, boolean isCheckmate) {
+        if(!isCheckmate) { return; }
+        SoundManager.playCheckmateSound();
+        statusLabel.setText("Мат");
+        statusLabel.setLayoutX(93);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
+    }
+
+    private void showAlertOnStalemate(String title, String message) {
+        SoundManager.playCheckmateSound();
+        statusLabel.setText("Пат");
+        statusLabel.setLayoutX(93);
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 
     // Метод для поиска узла по координатам в GridPane:

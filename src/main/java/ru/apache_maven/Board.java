@@ -1,19 +1,124 @@
 package ru.apache_maven;
 
+import javafx.scene.control.Label;
+import javafx.scene.layout.Pane;
 import ru.apache_maven.pieces.*;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Board {
     HashMap<Coordinates, Piece> pieces;
+
+    public Board(Board other) {
+        // Создаём новый HashMap для копии фигур
+        this.pieces = new HashMap<>();
+        // Проходим по всем записям оригинальной доски
+        for (Map.Entry<Coordinates, Piece> entry : other.pieces.entrySet()) {
+            // Копируем координаты; предполагается, что у Coordinates есть конструктор копирования
+            Coordinates coordCopy = new Coordinates(entry.getKey());
+            // Копируем фигуру с помощью вспомогательного метода copyPiece()
+            Piece pieceCopy = copyPiece(entry.getValue());
+            this.pieces.put(coordCopy, pieceCopy);
+        }
+    }
 
     public Board() {
         pieces = new HashMap<>();
     }
 
+    // Вспомогательный метод для копирования фигуры
+    private Piece copyPiece(Piece piece) {
+        // В зависимости от типа фигуры создаём новую копию
+        if (piece instanceof Pawn) {
+            return new Pawn(piece.getColor(), new Coordinates(piece.getCoordinates()));
+        } else if (piece instanceof Knight) {
+            return new Knight(piece.getColor(), new Coordinates(piece.getCoordinates()));
+        } else if (piece instanceof Bishop) {
+            return new Bishop(piece.getColor(), new Coordinates(piece.getCoordinates()));
+        } else if (piece instanceof Rook) {
+            return new Rook(piece.getColor(), new Coordinates(piece.getCoordinates()));
+        } else if (piece instanceof Queen) {
+            return new Queen(piece.getColor(), new Coordinates(piece.getCoordinates()));
+        } else if (piece instanceof King) {
+            return new King(piece.getColor(), new Coordinates(piece.getCoordinates()));
+        } else {
+            throw new IllegalArgumentException("Неизвестный тип фигуры: " + piece.getClass().getSimpleName());
+        }
+    }
+
     public void setPiece(Coordinates coordinates, Piece piece) {
         piece.coordinates = coordinates;
         pieces.put(coordinates, piece);
+    }
+
+    public boolean isStalemate(ColorChess color) {
+        // Если король под шахом – это не пат, а, возможно, мат.
+        if (isKingInCheck(null, color)) {
+            return false;
+        }
+
+        // Получаем все фигуры заданного цвета
+        Set<Piece> piecesOfColor = getAllPiecesOfColor(color);
+        // Для каждой фигуры проверяем, есть ли хотя бы один легальный ход
+        for (Piece piece : piecesOfColor) {
+            // Предполагается, что метод getLegalMoveSquares(Board board)
+            // возвращает множество ходов, при которых король не остаётся под шахом.
+            Set<Coordinates> legalMoves = piece.getLegalMoveSquares(null, this);
+            if (!legalMoves.isEmpty()) {
+                return false; // Найден хотя бы один допустимый ход
+            }
+        }
+        return true; // Нет ни одного допустимого хода, и король не под шахом → пат
+    }
+
+
+    public boolean isCheckmate(Label label, ColorChess color, boolean isInCheck) {
+        if (!isInCheck) { return false; }// Если король не под шахом – не мат.
+        // Получаем все фигуры заданного цвета
+        for (Piece piece : getAllPiecesOfColor(color)) {
+            for (Coordinates move : piece.getAvailableMoveSquares(this)) {
+                // Создаем копию доски и симулируем ход
+                Board copy = new Board(this);
+                copy.movePiece(piece.getCoordinates(), move);
+                if (!copy.isKingInCheck(label, color)) {
+                    return false; // Нашли ход, который спасает короля
+                }
+            }
+        }
+        //System.out.println("Мат");
+        return true;
+    }
+    public boolean isKingInCheck(Label label, ColorChess color) {
+        Coordinates kingPosition = null;
+        // Ищем короля заданного цвета
+        for (Map.Entry<Coordinates, Piece> entry : pieces.entrySet()) {
+            Piece piece = entry.getValue();
+            if (piece.getColor() == color && piece instanceof King) {
+                kingPosition = piece.getCoordinates();
+                break;
+            }
+        }
+
+        if (kingPosition == null) {
+            System.out.println("Король цвета " + color + " не найден на доске!");
+            //label.setText("Статус игры");
+            //label.setLayoutX(57);
+            return false;
+        }
+
+        for (Map.Entry<Coordinates, Piece> entry : pieces.entrySet()) {
+            Piece piece = entry.getValue();
+            if (piece.getColor() != color) {
+                Set<Coordinates> moves = piece.getAvailableMoveSquares(this);
+                if (moves.contains(kingPosition)) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public HashMap<Coordinates, Piece> getMatrix() {
@@ -31,10 +136,20 @@ public class Board {
         setPiece(to, piece);
     }
 
+    public Set<Piece> getAllPiecesOfColor(ColorChess color) {
+        Set<Piece> result = new HashSet<>();
+        for (Piece piece : pieces.values()) {
+            if (piece.getColor() == color) {
+                result.add(piece);
+            }
+        }
+        return result;
+    }
+
     public void setupDefaultPiecePositions() {
         for (File file : File.values()) {
             //Setting Pawns
-            //setPiece(new Coordinates(file, 2), new Pawn(ColorChess.WHITE, new Coordinates(file, 2)));
+            setPiece(new Coordinates(file, 2), new Pawn(ColorChess.WHITE, new Coordinates(file, 2)));
             setPiece(new Coordinates(file, 7), new Pawn(ColorChess.BLACK, new Coordinates(file, 7)));
         }
         //Setting Rooks
@@ -60,8 +175,6 @@ public class Board {
         setPiece(new Coordinates(File.E, 8), new King(ColorChess.BLACK, new Coordinates(File.E, 8)));
         setPiece(new Coordinates(File.D, 1), new Queen(ColorChess.WHITE, new Coordinates(File.D, 1)));
         setPiece(new Coordinates(File.D, 8), new Queen(ColorChess.BLACK, new Coordinates(File.D, 8)));
-
-        setPiece(new Coordinates(File.A, 3), new Pawn(ColorChess.WHITE, new Coordinates(File.A, 3)));
     }
 
     public static boolean isCellDark(Coordinates coordinates) {

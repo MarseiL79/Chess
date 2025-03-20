@@ -12,6 +12,10 @@ public class Coordinates {
         this.file = file;
         this.rank = rank;
     }
+    public Coordinates(Coordinates other) {
+        this.file = other.file;
+        this.rank = other.rank;
+    }
 
     public Coordinates shift(CoordinatesShift shift) {
         return new Coordinates(File.values()[this.file.ordinal() + shift.fileShift], this.rank + shift.rankShift);

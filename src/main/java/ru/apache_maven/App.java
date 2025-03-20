@@ -46,17 +46,6 @@ public class App extends Application {
     }
 
     public static void main(String[] args) {
-
-        Board board = new Board();
-        board.setPiece(new Coordinates(File.B, 1), new Knight(ColorChess.WHITE, new Coordinates(File.B, 1)));
-
-        Piece piece = board.getPiece(new Coordinates(File.B, 1));
-        Set<Coordinates> availableMoves = piece.getAvailableMoveSquares(board);
-
-        for (Coordinates coordinates: availableMoves) {
-            System.out.println(coordinates.file + " " + coordinates.rank);
-        }
-
         Application.launch();
     }
 

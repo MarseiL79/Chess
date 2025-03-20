@@ -1,5 +1,6 @@
 package ru.apache_maven.pieces;
 
+import javafx.scene.control.Label;
 import ru.apache_maven.Board;
 import ru.apache_maven.ColorChess;
 import ru.apache_maven.Coordinates;
@@ -15,6 +16,22 @@ public abstract class Piece {
     public Piece(ColorChess color, Coordinates coordinates) {
         this.color = color;
         this.coordinates = coordinates;
+    }
+
+    public Set<Coordinates> getLegalMoveSquares(Label label, Board board) {
+        Set<Coordinates> available = getAvailableMoveSquares(board);
+        Set<Coordinates> legal = new HashSet<>();
+        for (Coordinates move : available) {
+            // Создаем копию доски
+            Board copy = new Board(board);
+            // Симулируем ход: перемещаем фигуру с текущей позиции на move
+            copy.movePiece(this.coordinates, move);
+            // Если после хода король не под шахом, ход является законным
+            if (!copy.isKingInCheck(label, this.getColor())) {
+                legal.add(move);
+            }
+        }
+        return legal;
     }
 
     public ColorChess getColor() {

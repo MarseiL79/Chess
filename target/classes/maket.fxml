@@ -5,13 +5,16 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.control.Label?>
 
 <AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.apache_maven.ChessController">
     <children>
-        <!-- Элемент-индикатор, который будет показывать цвет хода -->
+        <!-- Элемент-индикатор, который показывает цвет хода -->
         <Rectangle fx:id="turnColorRectangle" width="80.0" height="80.0" fill="white"
                    AnchorPane.leftAnchor="70.0"
                    AnchorPane.topAnchor="100.0"/>
+        <!-- Label для отображения статуса игры (шах, мат, пат) -->
+        <Label fx:id="statusLabel" layoutX="57.0" layoutY="70.0" text="Статус игры" style="-fx-font-size: 18px;"/>
         <!-- Игровое поле -->
         <GridPane fx:id="chessBoardGrid" alignment="CENTER" gridLinesVisible="true"
                   maxWidth="640" prefHeight="600.0" prefWidth="600.0"

@@ -63,8 +63,15 @@
       <artifactId>javafx-graphics</artifactId>
       <version>21.0.2</version>
     </dependency>
-    <!-- JavaFX-->
+    <dependency>
+      <groupId>org.openjfx</groupId>
+      <artifactId>javafx-media</artifactId>
+      <version>21.0.2</version>
+    </dependency>
 
+
+
+    <!-- JavaFX-->
   </dependencies>
 
 

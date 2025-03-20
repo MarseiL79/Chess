@@ -1,3 +1,19 @@
 .root {
     -fx-background-color: #697175;
 }
+#statusLabel {
+    -fx-font-size: 18px;      /* Размер шрифта */
+    -fx-text-fill: #dadada;       /* Цвет текста */
+    -fx-font-weight: bold;    /* Жирный шрифт */
+    -fx-alignment: center;
+}
+
+.highlighted-cell {
+    -fx-background-color: rgb(95, 197, 95); /* Полупрозрачный зелёный */
+                /* Толщина границ */
+}
+
+.grid-cell {
+    -fx-border-color: black;
+    -fx-border-width: 0.5px;
+}
