@@ -1,30 +1,40 @@
 package ru.apache_maven;
 
-import javafx.fxml.FXML;
-import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 
 public class GameLogic {
-    ColorChess turnColor;
+    private ColorChess turnColor;
+    // Добавляем поле для цвета игрока, если нужно
+    private ColorChess playerColor;
+
     public GameLogic() {
         turnColor = ColorChess.WHITE;
     }
 
-    public ColorChess getTurnColor() {
+    public synchronized void setTurnColor(ColorChess color) {
+        this.turnColor = color;
+    }
+
+    public synchronized ColorChess getTurnColor() {
         return turnColor;
     }
-    public void turn() {
 
+    // Для клиента: сохранить свой назначенный цвет
+    public void setPlayerColor(ColorChess color) {
+        this.playerColor = color;
+    }
+
+    public ColorChess getPlayerColor() {
+        return playerColor;
     }
 
     public void changeTurnColor(Rectangle turnColorRectangle) {
         if (turnColor == ColorChess.WHITE) {
-            turnColor = ColorChess.BLACK; System.out.println("Ход черных");
-            turnColorRectangle.setFill(Color.BLACK);
-        }
-        else {
-            turnColor = ColorChess.WHITE; System.out.println("Ход белых");
-            turnColorRectangle.setFill(Color.WHITE);
+            turnColor = ColorChess.BLACK;
+            turnColorRectangle.setFill(javafx.scene.paint.Color.BLACK);
+        } else {
+            turnColor = ColorChess.WHITE;
+            turnColorRectangle.setFill(javafx.scene.paint.Color.WHITE);
         }
     }
 }

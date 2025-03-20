@@ -9,6 +9,12 @@ public class SoundManager {
     private static final AudioClip captureSound = new AudioClip(SoundManager.class.getResource("/sounds/capture.wav").toExternalForm());
     private static final AudioClip checkmateSound = new AudioClip(SoundManager.class.getResource("/sounds/notify.wav").toExternalForm());
 
+    public static void playAllSoundsZeroVolume() {
+        moveSound.play(0);
+        checkmateSound.play(0);
+        checkSound.play(0);
+        captureSound.play(0);
+    }
     public static void playMoveSound() {
         moveSound.play();
     }
@@ -24,4 +30,8 @@ public class SoundManager {
     public static void playCheckmateSound() {
         checkmateSound.play();
     }
+
+
 }
+
+

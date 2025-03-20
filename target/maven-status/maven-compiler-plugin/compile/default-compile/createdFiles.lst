@@ -1,3 +1,4 @@
+ru\apache_maven\online\OnlineChessClient.class
 ru\apache_maven\ColorChess.class
 ru\apache_maven\pieces\Queen.class
 ru\apache_maven\Coordinates.class
@@ -5,6 +6,7 @@ ru\apache_maven\ChessController.class
 ru\apache_maven\pieces\Pawn.class
 ru\apache_maven\SoundManager.class
 ru\apache_maven\pieces\Piece.class
+ru\apache_maven\online\OnlineChessServer$ClientHandler.class
 ru\apache_maven\pieces\CoordinatesShift.class
 ru\apache_maven\App.class
 ru\apache_maven\pieces\King.class
@@ -14,3 +16,4 @@ ru\apache_maven\File.class
 ru\apache_maven\Board.class
 ru\apache_maven\pieces\Rook.class
 ru\apache_maven\GameLogic.class
+ru\apache_maven\online\OnlineChessServer.class

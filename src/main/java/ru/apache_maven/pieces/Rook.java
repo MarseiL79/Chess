@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class Rook extends Piece {
+    public boolean didMove = false;
     public Rook(ColorChess color, Coordinates coordinates) {
         super(color, coordinates);
     }
@@ -29,6 +30,14 @@ public class Rook extends Piece {
                 new CoordinatesShift(0, -1),  // вниз
                 new CoordinatesShift(-1, 0)   // влево
         ));
+    }
+
+    public boolean hasMoved() {
+        return didMove;
+    }
+
+    public void setDidMove() {
+        didMove = true;
     }
 
     @Override

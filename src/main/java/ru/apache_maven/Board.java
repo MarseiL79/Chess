@@ -1,13 +1,9 @@
 package ru.apache_maven;
 
 import javafx.scene.control.Label;
-import javafx.scene.layout.Pane;
 import ru.apache_maven.pieces.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class Board {
     HashMap<Coordinates, Piece> pieces;
@@ -88,7 +84,6 @@ public class Board {
                 }
             }
         }
-        //System.out.println("Мат");
         return true;
     }
     public boolean isKingInCheck(Label label, ColorChess color) {
@@ -131,7 +126,10 @@ public class Board {
 
     public void movePiece(Coordinates from, Coordinates to) {
         Piece piece = getPiece(from);
-
+        if (piece == null) {
+            System.out.println("Warning: no piece found at " + from + ". Ход не выполнен.");
+            return;
+        }
         removePiece(from);
         setPiece(to, piece);
     }
@@ -177,15 +175,107 @@ public class Board {
         setPiece(new Coordinates(File.D, 8), new Queen(ColorChess.BLACK, new Coordinates(File.D, 8)));
     }
 
-    public static boolean isCellDark(Coordinates coordinates) {
-        return (((coordinates.file.ordinal() + 1) + coordinates.rank) % 2) == 0;
-    }
-
     public boolean isSquareEmpty(Coordinates coordinates) {
         return !(pieces.containsKey(coordinates));
     }
 
     public Piece getPiece(Coordinates coordinates) {
+        //if(pieces.get(coordinates))
         return pieces.get(coordinates);
+    }
+
+    public boolean isCastlingAvailable(Coordinates coordinates) {
+        if (Objects.equals(coordinates, new Coordinates(File.A, 8))) {
+            if(!(this.getPiece(new Coordinates(File.B,8)) == null) ||
+                    !(this.getPiece(new Coordinates(File.C,8)) == null) ||
+                    !(this.getPiece(new Coordinates(File.D,8)) == null)) {
+                return false;
+            }
+        }
+        else if (Objects.equals(coordinates, new Coordinates(File.H, 8))) {
+            if(!(this.getPiece(new Coordinates(File.G,8)) == null) ||
+                    !(this.getPiece(new Coordinates(File.F,8)) == null)) {
+                return false;
+            }
+        }
+        else if (Objects.equals(coordinates, new Coordinates(File.A, 1))) {
+            if(!(this.getPiece(new Coordinates(File.B,1)) == null) ||
+                    !(this.getPiece(new Coordinates(File.C,1)) == null)||
+                    !(this.getPiece(new Coordinates(File.D,1)) == null)) {
+                return false;
+            }
+        }
+        else if (Objects.equals(coordinates, new Coordinates(File.H, 1))) {
+            if(!(this.getPiece(new Coordinates(File.G,1)) == null) ||
+                    !(this.getPiece(new Coordinates(File.F,1)) == null)) {
+                return false;
+            }
+        }
+    return true;
+    }
+    public void doCastling(Coordinates coordinates, Piece king, Piece rook) {
+        ((King)king).setDidMove();
+        ((Rook)rook).setDidMove();
+        if(Objects.equals(rook.getCoordinates(), new Coordinates(File.A, 8))) {
+            this.removePiece(king.getCoordinates());
+            this.removePiece(rook.getCoordinates());
+            this.setPiece(new Coordinates(File.B, 8), king);
+            this.setPiece(new Coordinates(File.C, 8), rook);
+        }
+        else if(Objects.equals(rook.getCoordinates(), new Coordinates(File.H, 8))) {
+            this.removePiece(king.getCoordinates());
+            this.removePiece(rook.getCoordinates());
+            this.setPiece(new Coordinates(File.G, 8), king);
+            this.setPiece(new Coordinates(File.F, 8), rook);
+        }
+        else if(Objects.equals(rook.getCoordinates(), new Coordinates(File.A, 1))) {
+            this.removePiece(king.getCoordinates());
+            this.removePiece(rook.getCoordinates());
+            this.setPiece(new Coordinates(File.B, 1), king);
+            this.setPiece(new Coordinates(File.C, 1), rook);
+        }
+        else if(Objects.equals(rook.getCoordinates(), new Coordinates(File.H, 1))) {
+            this.removePiece(king.getCoordinates());
+            this.removePiece(rook.getCoordinates());
+            this.setPiece(new Coordinates(File.G, 1), king);
+            this.setPiece(new Coordinates(File.F, 1), rook);
+        }
+    }
+
+    public String doCastling(Coordinates coordsOfKing, Coordinates coordsOfRook) {
+        Piece king = this.getPiece(coordsOfKing);
+        Piece rook = this.getPiece(coordsOfRook);
+        ((King)king).setDidMove();
+        ((Rook)rook).setDidMove();
+        if(Objects.equals(rook.getCoordinates(), new Coordinates(File.A, 8))) {
+            this.removePiece(king.getCoordinates());
+            this.removePiece(rook.getCoordinates());
+            this.setPiece(new Coordinates(File.B, 8), king);
+            this.setPiece(new Coordinates(File.C, 8), rook);
+            return "CASTLE " + coordsOfKing.toString() + " B8 " + coordsOfRook.toString() + " C8 TURN ";
+
+        }
+        else if(Objects.equals(rook.getCoordinates(), new Coordinates(File.H, 8))) {
+            this.removePiece(king.getCoordinates());
+            this.removePiece(rook.getCoordinates());
+            this.setPiece(new Coordinates(File.G, 8), king);
+            this.setPiece(new Coordinates(File.F, 8), rook);
+            return "CASTLE " + coordsOfKing.toString() + " G8 " + coordsOfRook.toString() + " F8 TURN ";
+        }
+        else if(Objects.equals(rook.getCoordinates(), new Coordinates(File.A, 1))) {
+            this.removePiece(king.getCoordinates());
+            this.removePiece(rook.getCoordinates());
+            this.setPiece(new Coordinates(File.B, 1), king);
+            this.setPiece(new Coordinates(File.C, 1), rook);
+            return "CASTLE " + coordsOfKing.toString() + " B1 " + coordsOfRook.toString() + " C1 TURN ";
+        }
+        else if(Objects.equals(rook.getCoordinates(), new Coordinates(File.H, 1))) {
+            this.removePiece(king.getCoordinates());
+            this.removePiece(rook.getCoordinates());
+            this.setPiece(new Coordinates(File.G, 1), king);
+            this.setPiece(new Coordinates(File.F, 1), rook);
+            return "CASTLE " + coordsOfKing.toString() + " G1 " + coordsOfRook.toString() + " F1 TURN ";
+        }
+        return null;
     }
 }

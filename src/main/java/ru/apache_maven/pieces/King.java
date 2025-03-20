@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class King extends Piece {
+    private boolean didMove = false;
     public King(ColorChess color, Coordinates coordinates) {
         super(color, coordinates);
     }
@@ -18,6 +19,14 @@ public class King extends Piece {
         if (this.getColor() == ColorChess.WHITE) { res = "/images/white_king.png"; }
         else { res = "/images/black_king.png"; }
         return res;
+    }
+
+    public boolean hasMoved() {
+        return didMove;
+    }
+
+    public void setDidMove() {
+        didMove = true;
     }
 
     @Override

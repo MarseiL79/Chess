@@ -4,33 +4,30 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
-import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import ru.apache_maven.pieces.CoordinatesShift;
-import ru.apache_maven.pieces.Knight;
-import ru.apache_maven.pieces.Pawn;
-import ru.apache_maven.pieces.Piece;
+import ru.apache_maven.online.OnlineChessClient;
 
-//import java.util.
 import java.io.InputStream;
-import java.util.Objects;
-import java.util.Set;
 
 
 public class App extends Application {
     @Override
     public void start(Stage primaryStage) throws Exception {
-        //Через FXML файл
         FXMLLoader loader = new FXMLLoader(getClass().getResource("/maket.fxml"));
         Parent panel = loader.load();
 
         Board board = new Board();
         GameLogic gameLogic = new GameLogic();
-        board.setupDefaultPiecePositions(); // Устанавливаем начальные позиции фигур
+        board.setupDefaultPiecePositions();
 
         ChessController controller = loader.getController();
-        controller.setBoard(board); // Передаём board в контроллер
+        controller.setBoard(board);
         controller.setGameLogic(gameLogic);
+
+        // Создаём объект клиента, например, для подключения к localhost на порту 12345
+        OnlineChessClient onlineClient = new OnlineChessClient("localhost", 12345, controller);
+        onlineClient.start();
+        controller.setOnlineClient(onlineClient);
 
         Scene scene = new Scene(panel, 1000, 800);
         scene.getStylesheets().add(getClass().getResource("/styles.css").toExternalForm());
@@ -42,7 +39,6 @@ public class App extends Application {
         Image image = new Image(iconStream);
         primaryStage.getIcons().add(image);
         primaryStage.setResizable(false);
-
     }
 
     public static void main(String[] args) {

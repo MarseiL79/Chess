@@ -2,8 +2,6 @@ package ru.apache_maven;
 
 import ru.apache_maven.pieces.CoordinatesShift;
 
-import java.util.Objects;
-
 public class Coordinates {
     public final File file;
     public final Integer rank;
@@ -35,9 +33,9 @@ public class Coordinates {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        
+
         Coordinates that = (Coordinates) o;
-        
+
         if (file != that.file) return false;
         return rank.equals(that.rank);
     }
@@ -48,4 +46,10 @@ public class Coordinates {
         result = 31 + result + rank.hashCode();
         return result;
     }
+
+    @Override
+    public String toString() {
+        return file.toString() + rank;
+    }
+
 }
