@@ -13,6 +13,16 @@
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-media/21.0.2/javafx-media-21.0.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-controls/21.0.2/javafx-controls-21.0.2.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/openjfx/javafx-fxml/21.0.2/javafx-fxml-21.0.2-win.jar" path-in-jar="/" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-base:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-base:win:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:win:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-controls:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-fxml:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-fxml:win:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:win:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-graphics:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-media:21.0.2" />
+      <element id="library" level="project" name="Maven: org.openjfx:javafx-media:win:21.0.2" />
     </root>
   </artifact>
 </component>

@@ -12,6 +12,7 @@ ru\apache_maven\App.class
 ru\apache_maven\pieces\King.class
 ru\apache_maven\pieces\Knight.class
 ru\apache_maven\pieces\Bishop.class
+Main1.class
 ru\apache_maven\File.class
 ru\apache_maven\Board.class
 ru\apache_maven\pieces\Rook.class

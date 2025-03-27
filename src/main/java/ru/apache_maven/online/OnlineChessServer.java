@@ -1,9 +1,8 @@
 package ru.apache_maven.online;
 
-import ru.apache_maven.Board;
-import ru.apache_maven.ColorChess;
-import ru.apache_maven.Coordinates;
+import ru.apache_maven.*;
 import ru.apache_maven.File;
+import ru.apache_maven.pieces.*;
 
 import java.io.*;
 import java.net.*;
@@ -22,7 +21,8 @@ public class OnlineChessServer {
     private ColorChess turnColor = ColorChess.WHITE;
 
     public OnlineChessServer(int port) throws IOException {
-        serverSocket = new ServerSocket(port);
+        // Прослушиваем все сетевые интерфейсы
+        serverSocket = new ServerSocket(port, 50, InetAddress.getByName("0.0.0.0"));
         board = new Board();
         board.setupDefaultPiecePositions();
         System.out.println("Сервер запущен на порту " + port);
@@ -74,11 +74,18 @@ public class OnlineChessServer {
             if (parts.length == 3) {
                 Coordinates from = parseCoordinates(parts[1]);
                 Coordinates to = parseCoordinates(parts[2]);
+
+                // Определяем, есть ли фигура в клетке to (то есть ход является захватом)
+                boolean capture = board.getPiece(to) != null;
+
                 board.movePiece(from, to);
-                toggleTurn(); // Меняем ход
-                // Формируем сообщение для рассылки
-                String moveMessage = "MOVE " + parts[1] + " " + parts[2] + " TURN " + turnColor;
-                broadcast(moveMessage, null); // отправляем всем
+                toggleTurn(); // переключаем ход
+
+                boolean isCheck = board.isKingInCheck(null, turnColor);
+
+                // Формируем сообщение с флагом захвата
+                String moveMessage = "MOVE " + parts[1] + " " + parts[2] + " CAPTURE " + capture + " CHECK " + isCheck + " TURN " + turnColor;
+                broadcast(moveMessage, null);
             }
         }
         if (message.startsWith("CASTLE")) {
@@ -93,6 +100,42 @@ public class OnlineChessServer {
                 broadcast(message, null);
             }
         }
+        if (message.startsWith("PROMOTION")) {
+            String[] parts = message.split(" ");
+            // parts: [ "PROMOTION", "E7", "E8", "QUEEN" ]
+            if (parts.length == 4) {
+                Coordinates from = parseCoordinates(parts[1]);
+                Coordinates to = parseCoordinates(parts[2]);
+                String newPieceType = parts[3];
+
+                // Удаляем пешку
+                ColorChess color = board.getPiece(from).getColor(); // Определите цвет, например, по пешке, которую убрали
+                board.removePiece(from);
+                // Ставим новую фигуру
+                Piece newPiece = null;
+
+                if (newPieceType.equals("QUEEN")) {
+                    newPiece = new Queen(color, to);
+                } else if (newPieceType.equals("ROOK")) {
+                    newPiece = new Rook(color, to);
+                } else if (newPieceType.equals("BISHOP")) {
+                    newPiece = new Bishop(color, to);
+                } else if (newPieceType.equals("KNIGHT")) {
+                    newPiece = new Knight(color, to);
+                }
+                if (newPiece != null) {
+                    board.setPiece(to, newPiece);
+                }
+
+                // Меняем ход
+                toggleTurn();
+
+                // Рассылаем сообщение всем клиентам
+                String promoMsg = "PROMOTION " + from + " " + to + " " + newPieceType + " TURN " + turnColor;
+                broadcast(promoMsg, null);
+            }
+        }
+
     }
 
 

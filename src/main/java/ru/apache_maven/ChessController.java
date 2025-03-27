@@ -13,9 +13,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.shape.Rectangle;
 import ru.apache_maven.online.OnlineChessClient;
-import ru.apache_maven.pieces.King;
-import ru.apache_maven.pieces.Piece;
-import ru.apache_maven.pieces.Rook;
+import ru.apache_maven.pieces.*;
 
 import java.io.InputStream;
 import java.net.URL;
@@ -154,13 +152,11 @@ public class ChessController implements Initializable {
     }
 
     private void tryToCastling(Piece king, Piece rook) {
-        if(((King)king).hasMoved() || ((Rook)rook).hasMoved()) {
+        if (((King) king).hasMoved() || ((Rook) rook).hasMoved()) {
             showAlertOnCastling("Король или Ладья уже двигались");
-        }
-        else if(!board.isCastlingAvailable(rook.getCoordinates())) {
+        } else if (!board.isCastlingAvailable(rook.getCoordinates())) {
             showAlertOnCastling("Между королём и ладьёй есть фигуры");
-        }
-        else {
+        } else {
             showOfferToCastling(king, rook);
         }
     }
@@ -205,25 +201,37 @@ public class ChessController implements Initializable {
 
     private void moveSelectedPiece(Coordinates target) {
         if (selectedPiece == null || onlineClient == null) return;
-        String message = "MOVE " + selectedCoordinates.toString() + " " + target.toString();
-        onlineClient.sendMessage(message);
 
-        Piece temp = board.getPiece(target);//Взяли фигуру по target координатам, чтобы потом воспроизвести необходимый звук
+        Piece tempTarget = board.getPiece(target);//Взяли фигуру по target координатам, чтобы потом воспроизвести необходимый звук
         //и чтобы не воспроизводить одновременно звук перемещения и шаха
+        Piece tempFrom = board.getPiece(selectedCoordinates);
 
-        if(board.getPiece(selectedCoordinates) instanceof  King) { //Если походил король или ладья, то они не могут
+        if (board.getPiece(selectedCoordinates) instanceof King) { //Если походил король или ладья, то они не могут
             ((King) board.getPiece(selectedCoordinates)).setDidMove(); // больше участвовать в рокировке
         }
-        if(board.getPiece(selectedCoordinates) instanceof Rook) {
+        if (board.getPiece(selectedCoordinates) instanceof Rook) {
             ((Rook) board.getPiece(selectedCoordinates)).setDidMove();
         }
 
+        if (tempFrom instanceof Pawn) {
+            // Для белых последняя горизонталь 8, для чёрных – 1
+            if ((tempFrom.getColor() == ColorChess.WHITE && target.rank == 8) ||
+                    (tempFrom.getColor() == ColorChess.BLACK && target.rank == 1)) {
+                // Сообщаем контроллеру о необходимости превратить пешку
+                // (например, через callback или напрямую, если Board знает о контроллере)
+                handlePromotion((Pawn) tempFrom, target);
+                return;
+            }
+        }
+        String message = "MOVE " + selectedCoordinates.toString() + " " + target.toString();
+        onlineClient.sendMessage(message);
+
         board.movePiece(selectedCoordinates, target);
 
-        if(!board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
-            if (temp == null) { SoundManager.playMoveSound(); }   //если в клетке никого нет, просто звук перемещения
-            else if (temp != null){ SoundManager.playCaptureSound(); } //если была фигура, съедаем её, звук съедания
-        }
+        //if(!board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
+            //if (tempTarget == null) { SoundManager.playMoveSound(); }   //если в клетке никого нет, просто звук перемещения
+            //else if (tempTarget != null){ SoundManager.playCaptureSound(); } //если была фигура, съедаем её, звук съедания
+        //}
         // Обновляем UI: перерисовываем доску и фигуры
         chessBoardGrid.getChildren().clear();
         setupChessBoard();
@@ -236,7 +244,7 @@ public class ChessController implements Initializable {
         if(board.isStalemate(gameLogic.getTurnColor())) { showAlertOnStalemate("Пат",
                 "Патовая ситуация для короля цвета " + gameLogic.getTurnColor()); }
         else if(board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
-            SoundManager.playCheckSound();
+            //SoundManager.playCheckSound();
             statusLabel.setText("Шах");
             statusLabel.setLayoutX(93);
         } else {
@@ -255,6 +263,50 @@ public class ChessController implements Initializable {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    public void handlePromotion(Pawn pawn, Coordinates position) {
+        // Создаём диалог без заголовка
+        Alert alert = new Alert(Alert.AlertType.NONE);
+        alert.setTitle("Пешка достигла конца!");
+        alert.setHeaderText("Выберите фигуру для превращения:");
+
+        // Создаём четыре кнопки
+        ButtonType queenBtn = new ButtonType("Ферзь");
+        ButtonType rookBtn = new ButtonType("Ладья");
+        ButtonType bishopBtn = new ButtonType("Слон");
+        ButtonType knightBtn = new ButtonType("Конь");
+        ButtonType cancelBtn = new ButtonType("Отмена");
+
+        alert.getButtonTypes().setAll(queenBtn, rookBtn, bishopBtn, knightBtn, cancelBtn);
+
+        // Показываем диалог и ждём выбора
+        Optional<ButtonType> result = alert.showAndWait();
+
+        // Если пользователь отменил – выходим
+        if (!result.isPresent() || result.get() == cancelBtn) {
+            return;
+        }
+
+        String userChoice = "";
+        // В зависимости от выбранной кнопки – создаём новую фигуру
+        Piece newPiece = null;
+        if (result.get() == queenBtn) {
+            newPiece = new Queen(pawn.getColor(), position);
+            userChoice = "QUEEN";
+        } else if (result.get() == rookBtn) {
+            newPiece = new Rook(pawn.getColor(), position);
+            userChoice = "ROOK";
+        } else if (result.get() == bishopBtn) {
+            newPiece = new Bishop(pawn.getColor(), position);
+            userChoice = "BISHOP";
+        } else if (result.get() == knightBtn) {
+            newPiece = new Knight(pawn.getColor(), position);
+            userChoice = "KNIGHT";
+        }
+
+        String message = "PROMOTION " + pawn.getCoordinates().toString() + " " + position.toString() + " " + userChoice;
+        onlineClient.sendMessage(message);
     }
 
     private void showAlertOnCastling(String message) {
@@ -279,7 +331,7 @@ public class ChessController implements Initializable {
             setupChessBoard();
             renderPieces();
             gameLogic.changeTurnColor(turnColorRectangle);
-            SoundManager.playMoveSound();
+            //SoundManager.playMoveSound();
         } else {
 
         }
@@ -336,8 +388,10 @@ public class ChessController implements Initializable {
                 chessBoardGrid.getChildren().clear();
                 setupChessBoard();
                 renderPieces();
+                SoundManager.playMoveSound();
 
                 if (board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
+                    SoundManager.playCheckSound();
                     statusLabel.setText("Шах");
                     statusLabel.setLayoutX(93);
                 } else {
@@ -346,30 +400,38 @@ public class ChessController implements Initializable {
                 }
             }
         }
-        if (message.startsWith("MOVE")) {
+        else if (message.startsWith("MOVE")) {
             String[] parts = message.split(" ");
-            if (parts.length == 5 && parts[3].equals("TURN")) {
+            // Ожидаемый формат: "MOVE A2 A4 CAPTURE false CHECK false TURN BLACK"
+            if (parts.length == 9 && parts[7].equals("TURN")) {
                 Coordinates from = parseCoordinates(parts[1]);
                 Coordinates to = parseCoordinates(parts[2]);
-                ColorChess newTurn = ColorChess.valueOf(parts[4]);
+                boolean capture = Boolean.parseBoolean(parts[4]);
+                boolean check = Boolean.parseBoolean(parts[6]);
+                ColorChess newTurn = ColorChess.valueOf(parts[8]);
 
-                // Применяем ход к объекту board
                 board.movePiece(from, to);
-                // Устанавливаем текущий ход согласно серверу
+
+                // Проигрываем звук на основании флага захвата
+                if (check) {
+                    SoundManager.playCheckSound();
+                } else if (capture){
+                    SoundManager.playCaptureSound();
+                } else {
+                    SoundManager.playMoveSound();
+                }
+
                 gameLogic.setTurnColor(newTurn);
-                // Обновляем индикатор хода на основе серверного значения
                 if (newTurn == ColorChess.WHITE) {
                     turnColorRectangle.setFill(javafx.scene.paint.Color.WHITE);
                 } else {
                     turnColorRectangle.setFill(javafx.scene.paint.Color.BLACK);
                 }
 
-                // Перерисовываем доску
                 chessBoardGrid.getChildren().clear();
                 setupChessBoard();
                 renderPieces();
 
-                // Обновляем статус (например, "Шах" или "Статус игры")
                 if (board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
                     statusLabel.setText("Шах");
                     statusLabel.setLayoutX(93);
@@ -379,6 +441,58 @@ public class ChessController implements Initializable {
                 }
             }
         }
+
+        else if (message.startsWith("PROMOTION")) {
+            // Формат: "PROMOTION E7 E8 QUEEN TURN BLACK"
+            String[] parts = message.split(" ");
+            // parts: [ "PROMOTION", "E7", "E8", "QUEEN", "TURN", "BLACK" ]
+            if (parts.length == 6 && parts[4].equals("TURN")) {
+                Coordinates from = parseCoordinates(parts[1]);
+                Coordinates to = parseCoordinates(parts[2]);
+                String newPieceType = parts[3];
+                ColorChess nextColor = ColorChess.valueOf(parts[5]);
+                ColorChess color = board.getPiece(from).getColor();
+                board.removePiece(from);
+                Piece newPiece = null;
+                if(!board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
+                    if (board.getPiece(to) == null) { SoundManager.playMoveSound(); }   //если в клетке никого нет, просто звук перемещения
+                    else if (board.getPiece(to) != null){ SoundManager.playCaptureSound(); } //если была фигура, съедаем её, звук съедания
+                }
+
+                if (newPieceType.equals("QUEEN")) {
+                    newPiece = new Queen(color, to);
+                } else if (newPieceType.equals("ROOK")) {
+                    newPiece = new Rook(color, to);
+                } else if (newPieceType.equals("BISHOP")) {
+                    newPiece = new Bishop(color, to);
+                } else if (newPieceType.equals("KNIGHT")) {
+                    newPiece = new Knight(color, to);
+                }
+                if (newPiece != null) {
+                    board.setPiece(to, newPiece);
+                }
+
+                gameLogic.setTurnColor(nextColor);
+                if (nextColor == ColorChess.WHITE) {
+                    turnColorRectangle.setFill(javafx.scene.paint.Color.WHITE);
+                } else {
+                    turnColorRectangle.setFill(javafx.scene.paint.Color.BLACK);
+                }
+                chessBoardGrid.getChildren().clear();
+                setupChessBoard();
+                renderPieces();
+
+                if (board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
+                    SoundManager.playCheckSound();
+                    statusLabel.setText("Шах");
+                    statusLabel.setLayoutX(93);
+                } else {
+                    statusLabel.setText("Статус игры");
+                    statusLabel.setLayoutX(57);
+                }
+            }
+        }
+
     }
 
 

@@ -3,6 +3,7 @@ package ru.apache_maven.online;
 import javafx.application.Platform;
 import ru.apache_maven.ChessController;
 import ru.apache_maven.ColorChess;
+import ru.apache_maven.SoundManager;
 
 import java.io.*;
 import java.net.Socket;
@@ -27,6 +28,7 @@ public class OnlineChessClient {
             socket = new Socket(serverIP, serverPort);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream(), "UTF-8"));
             out = new PrintWriter(new OutputStreamWriter(socket.getOutputStream(), "UTF-8"), true);
+            SoundManager.playAllSoundsZeroVolume();
 
             // Поток для чтения сообщений от сервера
             new Thread(() -> {
@@ -67,6 +69,11 @@ public class OnlineChessClient {
                 chessController.updateBoard(message);
             });
         } else if (message.startsWith("CASTLE")) {
+            // Формат сообщения: "MOVE A2 A4 TURN BLACK"
+            Platform.runLater(() -> {
+                chessController.updateBoard(message);
+            });
+        } else if (message.startsWith("PROMOTION")) {
             // Формат сообщения: "MOVE A2 A4 TURN BLACK"
             Platform.runLater(() -> {
                 chessController.updateBoard(message);
