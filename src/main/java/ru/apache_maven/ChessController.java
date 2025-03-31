@@ -10,7 +10,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.layout.VBox;
 import javafx.scene.shape.Rectangle;
 import ru.apache_maven.online.OnlineChessClient;
 import ru.apache_maven.pieces.*;
@@ -35,6 +37,11 @@ public class ChessController implements Initializable {
     private OnlineChessClient onlineClient;
     private ColorChess playerColor;
 
+    @FXML private Label bottomLetter1, bottomLetter2, bottomLetter3, bottomLetter4, bottomLetter5, bottomLetter6, bottomLetter7, bottomLetter8;
+    @FXML private Label leftDigit1, leftDigit2, leftDigit3, leftDigit4, leftDigit5, leftDigit6, leftDigit7, leftDigit8;
+    @FXML private Label upperLetter1, upperLetter2, upperLetter3, upperLetter4, upperLetter5, upperLetter6, upperLetter7, upperLetter8;
+    @FXML private Label rightDigit1, rightDigit2, rightDigit3, rightDigit4, rightDigit5, rightDigit6, rightDigit7, rightDigit8;
+
 
     public void setOnlineClient(OnlineChessClient client) {
         this.onlineClient = client;
@@ -45,7 +52,10 @@ public class ChessController implements Initializable {
         this.playerColor = color;
         gameLogic.setPlayerColor(color);
         // Обновляем UI в FX-потоке
-        Platform.runLater(() -> renderPieces());
+        Platform.runLater(() -> {
+            updateLabelsForColor(color);
+            renderPieces();
+        });
     }
 
 
@@ -65,6 +75,92 @@ public class ChessController implements Initializable {
         System.out.println("Board установлен, начинаем расстановку фигур!");
         renderPieces(); // Теперь вызываем метод после установки board
     }
+
+    private void updateLabelsForColor(ColorChess color) {
+        if (color == ColorChess.BLACK) {
+            // Снизу (bottomLetter1..8): H..A
+            bottomLetter1.setText("H");
+            bottomLetter2.setText("G");
+            bottomLetter3.setText("F");
+            bottomLetter4.setText("E");
+            bottomLetter5.setText("D");
+            bottomLetter6.setText("C");
+            bottomLetter7.setText("B");
+            bottomLetter8.setText("A");
+
+            // Слева (leftDigit1..8): 1..8
+            leftDigit1.setText("1");
+            leftDigit2.setText("2");
+            leftDigit3.setText("3");
+            leftDigit4.setText("4");
+            leftDigit5.setText("5");
+            leftDigit6.setText("6");
+            leftDigit7.setText("7");
+            leftDigit8.setText("8");
+
+            // Сверху (topLetter1..8): H..A
+            upperLetter1.setText("H");
+            upperLetter2.setText("G");
+            upperLetter3.setText("F");
+            upperLetter4.setText("E");
+            upperLetter5.setText("D");
+            upperLetter6.setText("C");
+            upperLetter7.setText("B");
+            upperLetter8.setText("A");
+
+            // Справа (rightDigit1..8): 1..8
+            rightDigit1.setText("1");
+            rightDigit2.setText("2");
+            rightDigit3.setText("3");
+            rightDigit4.setText("4");
+            rightDigit5.setText("5");
+            rightDigit6.setText("6");
+            rightDigit7.setText("7");
+            rightDigit8.setText("8");
+
+        } else {
+            // Снизу (bottomLetter1..8): A..H
+            bottomLetter1.setText("A");
+            bottomLetter2.setText("B");
+            bottomLetter3.setText("C");
+            bottomLetter4.setText("D");
+            bottomLetter5.setText("E");
+            bottomLetter6.setText("F");
+            bottomLetter7.setText("G");
+            bottomLetter8.setText("H");
+
+            // Слева (leftDigit1..8): 8..1
+            leftDigit1.setText("8");
+            leftDigit2.setText("7");
+            leftDigit3.setText("6");
+            leftDigit4.setText("5");
+            leftDigit5.setText("4");
+            leftDigit6.setText("3");
+            leftDigit7.setText("2");
+            leftDigit8.setText("1");
+
+            // Сверху (topLetter1..8): A..H
+            upperLetter1.setText("A");
+            upperLetter2.setText("B");
+            upperLetter3.setText("C");
+            upperLetter4.setText("D");
+            upperLetter5.setText("E");
+            upperLetter6.setText("F");
+            upperLetter7.setText("G");
+            upperLetter8.setText("H");
+
+            // Справа (rightDigit1..8): 8..1
+            rightDigit1.setText("8");
+            rightDigit2.setText("7");
+            rightDigit3.setText("6");
+            rightDigit4.setText("5");
+            rightDigit5.setText("4");
+            rightDigit6.setText("3");
+            rightDigit7.setText("2");
+            rightDigit8.setText("1");
+        }
+    }
+
 
     public void setGameLogic(GameLogic gameLogic) {
         this.gameLogic = gameLogic;
@@ -107,8 +203,14 @@ public class ChessController implements Initializable {
             pieceImage.setFitHeight(80);
 
             // Если игрок играет за черных, инвертируем строку
-            int row = (playerColor == ColorChess.BLACK) ? (coord.rank - 1) : (8 - coord.rank);
-            int col = coord.file.ordinal();
+            int row, col;
+            if (playerColor == ColorChess.WHITE) {
+                row = 8 - coord.rank;
+                col = coord.file.ordinal();
+            } else {
+                row = coord.rank - 1;
+                col = 7 - coord.file.ordinal();
+            }
             chessBoardGrid.add(pieceImage, col, row);
 
             pieceImage.setOnMouseClicked(event -> {
@@ -170,8 +272,16 @@ public class ChessController implements Initializable {
 
     private void highlightMoves(Set<Coordinates> possibleMoves) {
         for (Coordinates move : possibleMoves) {
-            int row = (playerColor == ColorChess.BLACK) ? (move.rank - 1) : (8 - move.rank);
-            Pane cell = (Pane) getNodeByRowColumnIndex(row, move.file.ordinal(), chessBoardGrid);
+            int row, col;
+            if (playerColor == ColorChess.WHITE) {
+                row = 8 - move.rank;
+                col = move.file.ordinal();
+            } else {
+                row = move.rank - 1;
+                col = 7 - move.file.ordinal();
+            }
+
+            Pane cell = (Pane) getNodeByRowColumnIndex(row, col, chessBoardGrid);
             if (cell != null) {
                 highlightedCells.put(cell, cell.getStyle());
                 cell.setStyle("-fx-background-color: rgb(102,255,130);");
@@ -179,7 +289,24 @@ public class ChessController implements Initializable {
                     clearHighlights();
                     gameLogic.changeTurnColor(turnColorRectangle);
                     if (selectedPiece == null) return;
-                    moveSelectedPiece(move);
+                    int clickedRow = GridPane.getRowIndex(cell);
+                    int clickedCol = GridPane.getColumnIndex(cell);
+
+                    // Восстанавливаем File/Rank
+                    File actualFile;
+                    int actualRank;
+                    if (playerColor == ColorChess.WHITE) {
+                        actualRank = 8 - clickedRow;
+                        actualFile = File.values()[clickedCol];
+                    } else {
+                        actualRank = clickedRow + 1;
+                        actualFile = File.values()[7 - clickedCol];
+                    }
+
+                    Coordinates actualTarget = new Coordinates(actualFile, actualRank);
+
+                    // Теперь вызываем moveSelectedPiece с «настоящими» координатами
+                    moveSelectedPiece(actualTarget);
                     showAlertOnCheckmate("Поражение", "Мат королю цвета " + gameLogic.getTurnColor(),
                             board.isCheckmate(statusLabel, gameLogic.getTurnColor(),
                                     board.isKingInCheck(statusLabel, gameLogic.getTurnColor())));

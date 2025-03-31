@@ -1,45 +1,127 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.shape.Rectangle?>
-<?import javafx.scene.control.Label?>
 
-<AnchorPane prefHeight="600.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ru.apache_maven.ChessController">
+<AnchorPane prefHeight="800.0" prefWidth="1000.0"
+            xmlns="http://javafx.com/javafx/17.0.2-ea"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="ru.apache_maven.ChessController">
+
     <children>
-        <!-- Элемент-индикатор, который показывает цвет хода -->
+        <!-- Индикатор хода -->
         <Rectangle fx:id="turnColorRectangle" width="80.0" height="80.0" fill="white"
                    AnchorPane.leftAnchor="70.0"
                    AnchorPane.topAnchor="100.0"/>
-        <!-- Label для отображения статуса игры (шах, мат, пат) -->
-        <Label fx:id="statusLabel" layoutX="57.0" layoutY="70.0" text="Статус игры" style="-fx-font-size: 18px;"/>
-        <!-- Игровое поле -->
-        <GridPane fx:id="chessBoardGrid" alignment="CENTER" gridLinesVisible="true"
-                  maxWidth="640" prefHeight="600.0" prefWidth="600.0"
-                  AnchorPane.leftAnchor="100.0" AnchorPane.topAnchor="0.0"
-                  AnchorPane.rightAnchor="10.0" AnchorPane.bottomAnchor="10.0">
+
+        <!-- Статус игры -->
+        <Label fx:id="statusLabel" layoutX="57.0" layoutY="70.0"
+               text="Статус игры" style="-fx-font-size: 18px;"/>
+
+        <!-- Рамка -->
+        <Rectangle width="680" height="680" fill="#541200"
+                   layoutX="195.0" layoutY="45.0"/>
+
+        <!-- Игровое поле (GridPane) -->
+        <GridPane fx:id="chessBoardGrid" gridLinesVisible="true"
+                  layoutX="215.0" layoutY="65.0"
+                  prefWidth="640.0" prefHeight="640.0">
             <columnConstraints>
-                <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="80.0" />
-                <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="80.0" />
-                <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="80.0" />
-                <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="80.0" />
-                <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="80.0" />
-                <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="80.0" />
-                <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="80.0" />
-                <ColumnConstraints hgrow="NEVER" minWidth="80.0" prefWidth="80.0" />
+                <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
+                <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
+                <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
+                <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
+                <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
+                <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
+                <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
+                <ColumnConstraints minWidth="80.0" prefWidth="80.0" />
             </columnConstraints>
             <rowConstraints>
-                <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="NEVER" />
-                <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="NEVER" />
-                <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="NEVER" />
-                <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="NEVER" />
-                <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="NEVER" />
-                <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="NEVER" />
-                <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="NEVER" />
-                <RowConstraints maxHeight="80.0" minHeight="80.0" prefHeight="80.0" vgrow="NEVER" />
+                <RowConstraints minHeight="80.0" prefHeight="80.0" />
+                <RowConstraints minHeight="80.0" prefHeight="80.0" />
+                <RowConstraints minHeight="80.0" prefHeight="80.0" />
+                <RowConstraints minHeight="80.0" prefHeight="80.0" />
+                <RowConstraints minHeight="80.0" prefHeight="80.0" />
+                <RowConstraints minHeight="80.0" prefHeight="80.0" />
+                <RowConstraints minHeight="80.0" prefHeight="80.0" />
+                <RowConstraints minHeight="80.0" prefHeight="80.0" />
             </rowConstraints>
         </GridPane>
+
+        <!-- Буквы снизу (A..H) -->
+        <Label fx:id="bottomLetter1" text="A" layoutX="250.0" layoutY="702.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="bottomLetter2" text="B" layoutX="330.0" layoutY="702.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="bottomLetter3" text="C" layoutX="410.0" layoutY="702.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="bottomLetter4" text="D" layoutX="490.0" layoutY="702.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="bottomLetter5" text="E" layoutX="570.0" layoutY="702.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="bottomLetter6" text="F" layoutX="650.0" layoutY="702.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="bottomLetter7" text="G" layoutX="730.0" layoutY="702.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="bottomLetter8" text="H" layoutX="810.0" layoutY="702.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+
+        <!-- Цифры слева (8..1) -->
+        <Label fx:id="leftDigit1" text="8" layoutX="200.0" layoutY="95.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="leftDigit2" text="7" layoutX="200.0" layoutY="175.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="leftDigit3" text="6" layoutX="200.0" layoutY="255.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="leftDigit4" text="5" layoutX="200.0" layoutY="335.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="leftDigit5" text="4" layoutX="200.0" layoutY="415.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="leftDigit6" text="3" layoutX="200.0" layoutY="495.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="leftDigit7" text="2" layoutX="200.0" layoutY="575.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+        <Label fx:id="leftDigit8" text="1" layoutX="200.0" layoutY="655.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold;"/>
+
+        <!-- Буквы сверху (A..H) -->
+        <Label fx:id="upperLetter1" text="A" layoutX="250.0" layoutY="42.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="upperLetter2" text="B" layoutX="330.0" layoutY="42.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="upperLetter3" text="C" layoutX="410.0" layoutY="42.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="upperLetter4" text="D" layoutX="490.0" layoutY="42.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="upperLetter5" text="E" layoutX="570.0" layoutY="42.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="upperLetter6" text="F" layoutX="650.0" layoutY="42.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="upperLetter7" text="G" layoutX="730.0" layoutY="42.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="upperLetter8" text="H" layoutX="810.0" layoutY="42.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+
+        <!-- Цифры справа (8..1) -->
+        <Label fx:id="rightDigit1" text="8" layoutX="860.0" layoutY="95.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="rightDigit2" text="7" layoutX="860.0" layoutY="175.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="rightDigit3" text="6" layoutX="860.0" layoutY="255.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="rightDigit4" text="5" layoutX="860.0" layoutY="335.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="rightDigit5" text="4" layoutX="860.0" layoutY="415.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="rightDigit6" text="3" layoutX="860.0" layoutY="495.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="rightDigit7" text="2" layoutX="860.0" layoutY="575.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
+        <Label fx:id="rightDigit8" text="1" layoutX="860.0" layoutY="655.0"
+               style="-fx-font-size:16px; -fx-text-fill:#F5F5DCFF; -fx-font-weight:bold; -fx-rotate: 180"/>
     </children>
 </AnchorPane>
