@@ -190,7 +190,7 @@ public class ChessController implements Initializable {
     private void renderPieces() {
         // Очищаем сетку доски
         chessBoardGrid.getChildren().clear();
-        // Рендерим клетки доски (например, вызываем setupChessBoard())
+        // Рендерим клетки доски
         setupChessBoard();
 
         // Перебираем все фигуры, находящиеся на доске
@@ -224,7 +224,7 @@ public class ChessController implements Initializable {
                         highlightedCellsToDefault();
                         return;
                     }
-                    // Обработка рокировки и взятия, как у вас
+                    // Обработка рокировки и взятия
                     if (selectedPiece instanceof King && piece instanceof Rook && selectedPiece.getColor() == piece.getColor()) {
                         tryToCastling(selectedPiece, piece);
                         return;
@@ -257,7 +257,7 @@ public class ChessController implements Initializable {
         if (((King) king).hasMoved() || ((Rook) rook).hasMoved()) {
             showAlertOnCastling("Король или Ладья уже двигались");
         } else if (!board.isCastlingAvailable(rook.getCoordinates())) {
-            showAlertOnCastling("Между королём и ладьёй есть фигуры");
+            showAlertOnCastling("Между королём и ладьёй есть фигуры или битые поля");
         } else {
             showOfferToCastling(king, rook);
         }
@@ -329,49 +329,68 @@ public class ChessController implements Initializable {
     private void moveSelectedPiece(Coordinates target) {
         if (selectedPiece == null || onlineClient == null) return;
 
-        Piece tempTarget = board.getPiece(target);//Взяли фигуру по target координатам, чтобы потом воспроизвести необходимый звук
-        //и чтобы не воспроизводить одновременно звук перемещения и шаха
+        // Сохраним, была ли в клетке target какая-то фигура (для обычного взятия)
+        Piece tempTarget = board.getPiece(target);
         Piece tempFrom = board.getPiece(selectedCoordinates);
 
-        if (board.getPiece(selectedCoordinates) instanceof King) { //Если походил король или ладья, то они не могут
-            ((King) board.getPiece(selectedCoordinates)).setDidMove(); // больше участвовать в рокировке
+        // Если король или ладья, помечаем, что они уже ходили (для блокировки рокировки)
+        if (tempFrom instanceof King) {
+            ((King) tempFrom).setDidMove();
         }
-        if (board.getPiece(selectedCoordinates) instanceof Rook) {
-            ((Rook) board.getPiece(selectedCoordinates)).setDidMove();
+        if (tempFrom instanceof Rook) {
+            ((Rook) tempFrom).setDidMove();
         }
 
+        // Логика превращения пешки (promotion) осталась без изменений
         if (tempFrom instanceof Pawn) {
-            // Для белых последняя горизонталь 8, для чёрных – 1
             if ((tempFrom.getColor() == ColorChess.WHITE && target.rank == 8) ||
                     (tempFrom.getColor() == ColorChess.BLACK && target.rank == 1)) {
-                // Сообщаем контроллеру о необходимости превратить пешку
-                // (например, через callback или напрямую, если Board знает о контроллере)
                 handlePromotion((Pawn) tempFrom, target);
                 return;
             }
         }
+
         String message = "MOVE " + selectedCoordinates.toString() + " " + target.toString();
         onlineClient.sendMessage(message);
 
+        // Перед тем, как вызвать board.movePiece, сохраним координаты для проверки en passant:
+        boolean wasEnPassantCapture = false;
+        if (tempFrom instanceof Pawn
+                && Math.abs(selectedCoordinates.file.ordinal() - target.file.ordinal()) == 1
+                && board.isSquareEmpty(target)) {
+            // Если пешка ходит по диагонали в пустую клетку — это en passant
+            wasEnPassantCapture = true;
+        }
+
+        // Выполняем собственно ход (внутри movePiece будет удалена «проходная» пешка, если это был en passant)
         board.movePiece(selectedCoordinates, target);
 
-        //if(!board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
-            //if (tempTarget == null) { SoundManager.playMoveSound(); }   //если в клетке никого нет, просто звук перемещения
-            //else if (tempTarget != null){ SoundManager.playCaptureSound(); } //если была фигура, съедаем её, звук съедания
-        //}
+        // После того, как на доске сделан ход, воспроизводим соответствующий звук:
+        if (wasEnPassantCapture) {
+            // Взятие на проходе
+            SoundManager.playCaptureSound();
+        } else if (tempTarget != null) {
+            // Обычное взятие (клетка была занята)
+            SoundManager.playCaptureSound();
+        } else {
+            // Просто ход без взятия
+            SoundManager.playMoveSound();
+        }
+
         // Обновляем UI: перерисовываем доску и фигуры
         chessBoardGrid.getChildren().clear();
         setupChessBoard();
         renderPieces();
-        // Сбрасываем выбранную фигуру
 
+        // Сброс выбранной фигуры
         selectedPiece = null;
         selectedPieceImage = null;
         selectedCoordinates = null;
-        if(board.isStalemate(gameLogic.getTurnColor())) { showAlertOnStalemate("Пат",
-                "Патовая ситуация для короля цвета " + gameLogic.getTurnColor()); }
-        else if(board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
-            //SoundManager.playCheckSound();
+
+        // Проверка пат/шах/мат
+        if (board.isStalemate(gameLogic.getTurnColor())) {
+            showAlertOnStalemate("Пат", "Патовая ситуация для короля цвета " + gameLogic.getTurnColor());
+        } else if (board.isKingInCheck(statusLabel, gameLogic.getTurnColor())) {
             statusLabel.setText("Шах");
             statusLabel.setLayoutX(93);
         } else {
@@ -487,7 +506,6 @@ public class ChessController implements Initializable {
         return null;
     }
 
-    // Обновите метод updateBoard для обработки сообщения от сервера:
     public void updateBoard(String message) {
         // Ожидаемый формат: "MOVE A2 A4 TURN BLACK"
         if(message.startsWith("CASTLE")) {

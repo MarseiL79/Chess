@@ -130,8 +130,48 @@ public class Board {
             System.out.println("Warning: no piece found at " + from + ". Ход не выполнен.");
             return;
         }
+
+        // 1) Сбросим флаг justDoubleStepped у всех пешек на доске,
+        //    потому что старое состояние «двойного хода» больше недействительно после любого хода.
+        for (Piece p : pieces.values()) {
+            if (p instanceof Pawn) {
+                ((Pawn) p).setJustDoubleStepped(false);
+            }
+        }
+
+        // 2) Проверим, будет ли текущий ход двойным шагом для пешки
+        boolean isPawnDoubleStep = false;
+        if (piece instanceof Pawn) {
+            int rankDiff = to.rank - from.rank;
+            if (Math.abs(rankDiff) == 2) {
+                isPawnDoubleStep = true;
+            }
+        }
+
+        // 3) Проверим случай en passant: если перемещается пешка по диагонали,
+        //    а целевая клетка пуста — значит именно en passant. Тогда нужно убрать вражескую пешку.
+        if (piece instanceof Pawn
+                && Math.abs(from.file.ordinal() - to.file.ordinal()) == 1
+                && isSquareEmpty(to)) {
+            // Для белой пешки: она идёт с rank 5 на rank 6, убираем чёрную пешку на rank 5
+            // Для чёрной пешки: с rank 4 на rank 3, убираем белую пешку на rank 4
+            int victimRank = (piece.getColor() == ColorChess.WHITE) ? to.rank - 1 : to.rank + 1;
+            Coordinates victimCoord = new Coordinates(to.file, victimRank);
+            Piece victim = getPiece(victimCoord);
+            if (victim instanceof Pawn && victim.getColor() != piece.getColor()) {
+                // Удаляем съеденную «на проходе» пешку
+                removePiece(victimCoord);
+            }
+        }
+
+        // 4) Перемещаем саму фигуру
         removePiece(from);
         setPiece(to, piece);
+
+        // 5) Если это был двойной шаг пешки, помечаем её как «justDoubleStepped»
+        if (isPawnDoubleStep) {
+            ((Pawn) piece).setJustDoubleStepped(true);
+        }
     }
 
     public Set<Piece> getAllPiecesOfColor(ColorChess color) {
@@ -184,34 +224,63 @@ public class Board {
         return pieces.get(coordinates);
     }
 
-    public boolean isCastlingAvailable(Coordinates coordinates) {
-        if (Objects.equals(coordinates, new Coordinates(File.A, 8))) {
-            if(!(this.getPiece(new Coordinates(File.B,8)) == null) ||
-                    !(this.getPiece(new Coordinates(File.C,8)) == null) ||
-                    !(this.getPiece(new Coordinates(File.D,8)) == null)) {
-                return false;
+    public boolean isSquareUnderAttack(Coordinates coord, ColorChess opponentColor) {
+        for (Piece piece : getAllPiecesOfColor(opponentColor)) {
+            if (piece.getAvailableMoveSquares(this).contains(coord)) {
+                return true;
             }
         }
-        else if (Objects.equals(coordinates, new Coordinates(File.H, 8))) {
-            if(!(this.getPiece(new Coordinates(File.G,8)) == null) ||
-                    !(this.getPiece(new Coordinates(File.F,8)) == null)) {
-                return false;
+        return false;
+    }
+
+
+    public boolean isCastlingAvailable(Coordinates rookCoords) {
+        Piece rook = getPiece(rookCoords);
+        if (!(rook instanceof Rook)) return false;
+        Coordinates kingCoords = null;
+        // Найдём соответствующего короля того же цвета:
+        for (Map.Entry<Coordinates, Piece> entry : pieces.entrySet()) {
+            if (entry.getValue() instanceof King && entry.getValue().getColor() == rook.getColor()) {
+                kingCoords = entry.getKey();
+                break;
             }
         }
-        else if (Objects.equals(coordinates, new Coordinates(File.A, 1))) {
-            if(!(this.getPiece(new Coordinates(File.B,1)) == null) ||
-                    !(this.getPiece(new Coordinates(File.C,1)) == null)||
-                    !(this.getPiece(new Coordinates(File.D,1)) == null)) {
+        if (kingCoords == null) return false;
+
+        // 1. Проверяем пустоту промежуточных полей:
+        int rank = kingCoords.rank;
+        if (rookCoords.file == File.A) {
+            // длинная рокировка (влево)
+            if (!isSquareEmpty(new Coordinates(File.B, rank)) ||
+                    !isSquareEmpty(new Coordinates(File.C, rank)) ||
+                    !isSquareEmpty(new Coordinates(File.D, rank))) {
                 return false;
             }
-        }
-        else if (Objects.equals(coordinates, new Coordinates(File.H, 1))) {
-            if(!(this.getPiece(new Coordinates(File.G,1)) == null) ||
-                    !(this.getPiece(new Coordinates(File.F,1)) == null)) {
+            // 2. Проверяем, что «король» не под атакой ни на текущей, ни на B, ни на C:
+            ColorChess oppColor = (rook.getColor() == ColorChess.WHITE) ? ColorChess.BLACK : ColorChess.WHITE;
+            if (isSquareUnderAttack(kingCoords, oppColor) ||
+                    isSquareUnderAttack(new Coordinates(File.D, rank), oppColor) ||
+                    isSquareUnderAttack(new Coordinates(File.C, rank), oppColor)) {
                 return false;
             }
+        } else if (rookCoords.file == File.H) {
+            // короткая рокировка (вправо)
+            if (!isSquareEmpty(new Coordinates(File.G, rank)) ||
+                    !isSquareEmpty(new Coordinates(File.F, rank))) {
+                return false;
+            }
+            // Проверяем клетки F и G:
+            ColorChess oppColor = (rook.getColor() == ColorChess.WHITE) ? ColorChess.BLACK : ColorChess.WHITE;
+            if (isSquareUnderAttack(kingCoords, oppColor) ||
+                    isSquareUnderAttack(new Coordinates(File.F, rank), oppColor) ||
+                    isSquareUnderAttack(new Coordinates(File.G, rank), oppColor)) {
+                return false;
+            }
+        } else {
+            return false; // ладья не на A или H — рокировка невозможна
         }
-    return true;
+
+        return true;
     }
     public void doCastling(Coordinates coordinates, Piece king, Piece rook) {
         ((King)king).setDidMove();
